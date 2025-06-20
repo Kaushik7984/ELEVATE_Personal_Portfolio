@@ -1,45 +1,81 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import './skillbar.scss';
+import "./skillbar.scss";
+import { useGetSkillsQuery } from "../../redux/api/skillsApi";
+import { motion } from "framer-motion";
 
-const skills = [
-  { name: 'HTML', percentage: '90%' },
-  { name: 'CSS', percentage: '80%' },
-  { name: 'JavaScript', percentage: '80%' },
-  { name: 'ReactJS', percentage: '78%' },
-  // { name: 'ReduxJS', percentage: '50%' },
-  // { name: 'NextJS', percentage: '50%' },
-  { name: 'NodeJs', percentage: '70%' },
-  { name: 'ExpressJs', percentage: '70%' },
-  { name: 'MongoDB', percentage: '50%' },
-];
+const groupSkillsByCategory = (skills) => {
+  const grouped = {};
+  skills.forEach((skill) => {
+    if (!grouped[skill.category]) grouped[skill.category] = [];
+    grouped[skill.category].push(skill);
+  });
+  return grouped;
+};
+
+const textVariants = {
+  initial: {
+    x: 500,
+    opacity: 0,
+  },
+  animate: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      duration: 1,
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 const Skillbar = () => {
+  const { data: skills = [], isLoading } = useGetSkillsQuery();
+  const grouped = groupSkillsByCategory(skills);
+
   return (
-    <section className="skills" id="skills">
-      <h3 className="skills-header">My Skills</h3>
-      <div className="skills-container">
-        {skills.map((skill) => (
-          <motion.div
-            className="skill-container"
-            key={skill.name}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <p>{skill.name}</p>
-            <div className="bar">
-              <motion.span
-                className={skill.name.toLowerCase()}
-                initial={{ width: 0 }}
-                animate={{ width: skill.percentage }}
-                transition={{ duration: 1, ease: 'easeInOut' }}
-              ></motion.span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
+    <motion.section
+      className='skills'
+      id='skills'
+      variants={textVariants}
+      initial='initial'
+      animate='animate'
+    >
+      <motion.h3 className='skills-header' variants={textVariants}>
+        Under the Hood
+      </motion.h3>
+      {isLoading ? (
+        <div style={{ textAlign: "center", color: "#ffa500", fontWeight: 500 }}>
+          Loading skills...
+        </div>
+      ) : (
+        <motion.div className='skills-categories' variants={textVariants}>
+          {Object.keys(grouped).map((category) => (
+            <motion.div
+              className='skills-category'
+              key={category}
+              variants={textVariants}
+            >
+              <motion.h4
+                className='skills-category-title'
+                variants={textVariants}
+              >
+                {category}
+              </motion.h4>
+              <motion.div className='skills-badges' variants={textVariants}>
+                {grouped[category].map((skill) => (
+                  <motion.img
+                    key={skill._id}
+                    src={skill.badge}
+                    alt={skill.name + " badge"}
+                    className='skill-badge'
+                    loading='lazy'
+                    variants={textVariants}
+                  />
+                ))}
+              </motion.div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </motion.section>
   );
 };
 

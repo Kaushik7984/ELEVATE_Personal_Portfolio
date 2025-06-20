@@ -23,8 +23,8 @@
       background-color: white;
     }
 
-    h1{
-      @include mobile{
+    h1 {
+      @include mobile {
         font-size: 35px;
       }
     }
@@ -46,6 +46,7 @@
       align-items: center;
       justify-content: center;
       gap: 50px;
+      padding: 15px;
 
       @include mobile {
         flex-direction: column;

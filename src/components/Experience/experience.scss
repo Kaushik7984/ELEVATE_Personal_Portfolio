@@ -1,0 +1,146 @@
+@import "../../app.scss";
+
+.experience-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg,#111132, #111132) ;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    padding: 2rem 0.5rem 1.5rem 0.5rem;
+  }
+
+  .experience-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: #ffffff;
+    border-bottom: 2px solid #444;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    @media (max-width: 600px) {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.3rem;
+    }
+  }
+
+  .experience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ffa500 #23243a;
+    @media (max-width: 600px) {
+      gap: 1rem;
+      max-width: 100vw;
+      // max-height: 60vh;
+    }
+  }
+
+  .experience-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  .experience-list::-webkit-scrollbar-thumb {
+    background: #ffa500;
+    border-radius: 4px;
+  }
+  .experience-list::-webkit-scrollbar-track {
+    background: #23243a;
+  }
+
+  .experience-card {
+    background: #23243a;
+    border: 1px solid #2d2d44;
+    padding: 2rem;
+    margin-right: 10px;
+    border-radius: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    @media (max-width: 600px) {
+      padding: 1rem 0.7rem;
+      margin-right: 0;
+      border-radius: 0.7rem;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .experience-role {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #ffa500;
+      @media (max-width: 600px) {
+        
+        font-size: 1.1rem;
+      }
+
+      span {
+        color: #aaa;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-left: 1rem;
+        @media (max-width: 600px) {
+          font-size: 0.9rem;
+          margin-left: 0.5rem;
+        }
+      }
+    }
+
+    .experience-meta {
+      font-size: 0.95rem;
+      color: #bbb;
+      margin: 0.5rem 0 1rem;
+      @media (max-width: 600px) {
+        font-size: 0.85rem;
+        margin: 0.3rem 0 0.7rem;
+      }
+    }
+
+    .experience-tech,
+    .experience-skills {
+      font-size: 0.95rem;
+      color: #ccc;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+
+      strong {
+        font-weight: 600;
+      }
+      @media (max-width: 600px) {
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+      }
+    }
+
+    .experience-desc {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #ddd;
+      @media (max-width: 600px) {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .experience-list {
+    max-width: 98vw;
+    max-height: 60vh;
+  }
+  .experience-card {
+    padding: 18px 10px;
+  }
+}

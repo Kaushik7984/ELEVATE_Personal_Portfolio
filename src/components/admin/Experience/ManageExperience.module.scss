@@ -1,0 +1,183 @@
+.manageExperience {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, #0c0c1d, #111132);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: 40px 0;
+  @media (max-width: 600px) {
+    padding: 10px 0;
+  }
+}
+
+.heading {
+  width: 100%;
+  text-align: center;
+  color: #ffa500;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  @media (max-width: 600px) {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.form {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 32px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #18192b;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.15);
+  align-items: stretch;
+  @media (max-width: 600px) {
+    padding: 10px;
+    gap: 8px;
+    max-width: 100vw;
+  }
+}
+
+.input,
+.textarea {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #23243a;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border 0.2s;
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+.button {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 0.5px solid #ffa500;
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(255, 165, 0, 0.15);
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 0.5rem 0.7rem;
+  }
+  &:hover,
+  &:focus {
+    transform: scale(1.04);
+    box-shadow: 0 4px 16px 0 rgba(255, 165, 0, 0.25);
+  }
+}
+
+.cancelButton {
+  background: #444;
+  color: #fff;
+  margin-top: 0;
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+.error {
+  color: #ff3e55;
+  margin-top: 8px;
+  font-size: 14px;
+  text-align: center;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
+}
+
+.experienceList {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.experienceCard {
+  width: 100%;
+  border: 1.5px solid #ffa500;
+  border-radius: 8px;
+  padding: 16px;
+  background: #23243a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(255, 165, 0, 0.1);
+  @media (max-width: 600px) {
+    padding: 8px;
+    gap: 5px;
+  }
+}
+
+.experienceTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffa500;
+  @media (max-width: 600px) {
+    font-size: 1rem;
+  }
+}
+
+.experienceDesc {
+  color: #ccc;
+  font-size: 1rem;
+  @media (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+}
+
+.cardActions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  @media (max-width: 600px) {
+    gap: 5px;
+  }
+}
+
+.editButton {
+  background: #00c8ff;
+  color: #fff;
+  @media (max-width: 600px) {
+    font-size: 13px;
+    padding: 0.4rem 0.7rem;
+  }
+}
+
+.deleteButton {
+  background: #ff3e55;
+  color: #fff;
+  @media (max-width: 600px) {
+    font-size: 13px;
+    padding: 0.4rem 0.7rem;
+  }
+} 

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import { FiDownload } from "react-icons/fi";
+import { useGetResumeQuery } from "../../../redux/api/resumeApi";
 
 const variants = {
   open: {
@@ -27,16 +28,34 @@ const itemVariants = {
   },
 };
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
+
 const Links = () => {
   const items = ["Home", "About", "Portfolio", "Contact"];
   const socialLinks = [
-    { href: "https://www.linkedin.com/in/kaushik-tapaniya-624142239/", icon: <FaLinkedin />, name: "LinkedIn" },
-    { href: "https://github.com/Kaushik7984", icon: <FaGithub />, name: "GitHub" },
-    { href: "https://www.instagram.com/kaushiiq_7x?igsh=bXdxYTNlNDN2cXk4", icon: <FaInstagram />, name: "Instagram" },
+    {
+      href: "https://www.linkedin.com/in/kaushik-tapaniya-624142239/",
+      icon: <FaLinkedin />,
+      name: "LinkedIn",
+    },
+    {
+      href: "https://github.com/Kaushik7984",
+      icon: <FaGithub />,
+      name: "GitHub",
+    },
+    {
+      href: "https://www.instagram.com/kaushiiq_7x?igsh=bXdxYTNlNDN2cXk4",
+      icon: <FaInstagram />,
+      name: "Instagram",
+    },
   ];
 
+  const { data, isLoading } = useGetResumeQuery();
+  const resumeUrl =
+    data && data.filename ? `${BACKEND_URL}/uploads/${data.filename}` : null;
+
   return (
-    <motion.div className="links" variants={variants}>
+    <motion.div className='links' variants={variants}>
       {items.map((item) => (
         <motion.a
           href={`#${item}`}
@@ -49,22 +68,27 @@ const Links = () => {
         </motion.a>
       ))}
       <motion.a
-        href="/Resume-Kaushik.pdf" 
-        download
-        className="download-cv"
+        href={resumeUrl || "#"}
+        target='_blank'
+        download={!!resumeUrl}
+        className='download-cv'
         variants={itemVariants}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
+        style={{
+          pointerEvents: resumeUrl ? "auto" : "none",
+          opacity: resumeUrl ? 1 : 0.5,
+        }}
       >
-        <FiDownload /> Download CV
+        <FiDownload /> {isLoading ? "Loading CV..." : "Download CV"}
       </motion.a>
-      <motion.div className="social-links">
+      <motion.div className='social-links'>
         {socialLinks.map((link) => (
           <motion.a
             href={link.href}
             key={link.name}
-            target="_blank"
-            rel="noopener noreferrer"
+            target='_blank'
+            rel='noopener noreferrer'
             variants={itemVariants}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
