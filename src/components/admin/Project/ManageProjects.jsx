@@ -17,7 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const initialForm = { title: "", img: "", desc: "", link: "", order: 0 };
+const initialForm = { title: "", img: "", desc: "", link: "", order: 0, techStack: "" };
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const SortableProject = ({ project, handleEdit, handleDelete }) => {
@@ -50,6 +50,11 @@ const SortableProject = ({ project, handleEdit, handleDelete }) => {
         className={styles.projectImg}
       />
       <span className={styles.projectDesc}>{project.desc}</span>
+      <div className={styles.techStack}>
+        {project.techStack?.map((tech, index) => (
+          <span key={index} className={styles.techPill}>{tech}</span>
+        ))}
+      </div>
       <a
         href={project.link}
         target='_blank'
@@ -60,12 +65,14 @@ const SortableProject = ({ project, handleEdit, handleDelete }) => {
       </a>
       <div className={styles.cardActions}>
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={() => handleEdit(project)}
           className={styles.editButton}
         >
           Edit
         </button>
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={() => handleDelete(project._id)}
           className={styles.deleteButton}
         >
@@ -116,6 +123,7 @@ const ManageProjects = ({ onBack }) => {
     formData.append("desc", form.desc);
     formData.append("link", form.link);
     formData.append("order", String(form.order));
+    formData.append("techStack", form.techStack);
     if (form.img instanceof File) {
       formData.append("img", form.img);
     }
@@ -143,6 +151,7 @@ const ManageProjects = ({ onBack }) => {
       desc: project.desc,
       link: project.link,
       order: project.order,
+      techStack: project.techStack?.join(", ") || "",
     });
     setEditingId(project._id);
     setImagePreview(project.img ? `${BACKEND_URL}${project.img}` : "");
@@ -216,6 +225,13 @@ const ManageProjects = ({ onBack }) => {
           onChange={handleChange}
           placeholder='Display Order'
           required
+          className={styles.input}
+        />
+        <input
+          name='techStack'
+          placeholder='Tech Stack (comma-separated)'
+          value={form.techStack || ''}
+          onChange={handleChange}
           className={styles.input}
         />
         <textarea

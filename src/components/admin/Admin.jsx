@@ -63,17 +63,17 @@ const Admin = () => {
             </div>
             <div
               className={styles.dashboardCard}
-              onClick={() => setSection("skills")}
-            >
-              <h3>Manage Skills</h3>
-              <p>Add, edit, or delete skills</p>
-            </div>
-            <div
-              className={styles.dashboardCard}
               onClick={() => setSection("experience")}
             >
               <h3>Manage Experience</h3>
               <p>Add, edit, or delete experience</p>
+            </div>
+            <div
+              className={styles.dashboardCard}
+              onClick={() => setSection("skills")}
+            >
+              <h3>Manage Skills</h3>
+              <p>Add, edit, or delete skills</p>
             </div>
             <div
               className={styles.dashboardCard}

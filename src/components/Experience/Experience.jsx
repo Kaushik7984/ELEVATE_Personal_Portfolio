@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import "./experience.scss";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { useGetExperiencesQuery } from '../../redux/api/experienceApi';
-import PropTypes from 'prop-types';
+import { useGetExperiencesQuery } from "../../redux/api/experienceApi";
+import PropTypes from "prop-types";
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -17,20 +17,34 @@ const SingleExperience = ({ item }) => {
         <div className='wrapper'>
           <div className='imageContainer' ref={ref}>
             <img
-              src={item.logo ? `${BACKEND_URL}/uploads/${item.logo}` : "/experience-default.png"}
+              src={
+                item.logo
+                  ? `${BACKEND_URL}/uploads/${item.logo}`
+                  : "/experience-default.png"
+              }
               alt={item.company}
-              className="logo"
+              className='logo'
             />
           </div>
           <motion.div className='textContainer' style={{ y }}>
             <h2>{item.role} </h2>
-            <span style={{fontWeight: 400, fontSize: '1.5rem', color: '#ffa500'}}>@ {item.company}</span>
-            <p style={{margin: 0, color: '#bbb'}}>{item.type} | {item.duration} | {item.location} | {item.mode}</p>
-            <p><strong>Technologies:</strong> {item.technologies.join(", ")}</p>
+            <span
+              style={{ fontWeight: 400, fontSize: "1rem", color: "#ffa500" }}
+            >
+              @ {item.company}
+            </span>
+            <p style={{ margin: 0, color: "#bbb" }}>
+              {item.type} | {item.duration} | {item.location} | {item.mode}
+            </p>
+            <p>
+              <strong>Technologies:</strong> {item.technologies.join(", ")}
+            </p>
             {item.skills && item.skills.length > 0 && (
-              <p><strong>Skills:</strong> {item.skills.join(", ")}</p>
+              <p>
+                <strong>Skills:</strong> {item.skills.join(", ")}
+              </p>
             )}
-            <p style={{color: '#eee'}}>{item.description}</p>
+            <p style={{ color: "#eee" }}>{item.description}</p>
           </motion.div>
         </div>
       </div>
@@ -86,9 +100,10 @@ const Experience = () => {
         <h1>Experience</h1>
         <motion.div style={{ scaleX }} className='progressBar'></motion.div>
       </div>
-      {items && items.map((item) => (
-        <SingleExperience item={item} key={item._id || item.id} />
-      ))}
+      {items &&
+        items.map((item) => (
+          <SingleExperience item={item} key={item._id || item.id} />
+        ))}
     </div>
   );
 };

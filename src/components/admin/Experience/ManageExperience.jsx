@@ -63,8 +63,8 @@ const SortableExperience = ({ experience, handleEdit, handleDelete }) => {
       <span><strong>Technologies:</strong> {experience.technologies.join(", ")}</span>
       <span className={styles.experienceDesc}>{experience.description}</span>
       <div className={styles.cardActions}>
-        <button className={styles.editButton} onClick={() => handleEdit(experience)}>Edit</button>
-        <button className={styles.deleteButton} onClick={() => handleDelete(experience._id)} style={{ marginLeft: 8 }}>Delete</button>
+        <button onPointerDown={(e) => e.stopPropagation()} className={styles.editButton} onClick={() => handleEdit(experience)}>Edit</button>
+        <button onPointerDown={(e) => e.stopPropagation()} className={styles.deleteButton} onClick={() => handleDelete(experience._id)} style={{ marginLeft: 8 }}>Delete</button>
       </div>
     </div>
   );
@@ -141,8 +141,12 @@ const ManageExperience = ({ onBack }) => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this experience?")) {
-      await deleteExperience(id);
-      refetch();
+      try {
+        await deleteExperience(id).unwrap();
+        refetch();
+      } catch (err) {
+        setError("Error deleting experience.");
+      }
     }
   };
 
