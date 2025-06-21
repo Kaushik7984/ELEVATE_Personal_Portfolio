@@ -19,7 +19,7 @@ export const experienceApi = createApi({
       invalidatesTags: ['Experience'],
     }),
     updateExperience: builder.mutation({
-      query: ({ id, ...data }) => ({ url: `experience/${id}`, method: 'PUT', body: data }),
+      query: ({ id, body }) => ({ url: `experience/${id}`, method: 'PUT', body }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Experience', id }],
     }),
     deleteExperience: builder.mutation({

@@ -12,6 +12,10 @@
     color: orange;
     font-size: 36px;
 
+    h1 {
+      font-size: 50px;
+    }
+
     @include mobile {
       position: sticky;
       padding-top: calc(100vh - 100px);
@@ -19,7 +23,7 @@
     }
 
     .progressBar {
-      height: 10px;
+      height: 5px;
       background-color: white;
     }
 
@@ -65,7 +69,7 @@
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
 
           @include mobile {
             object-fit: contain;
@@ -87,7 +91,7 @@
         }
 
         h2 {
-          font-size: 72px;
+          font-size: 50px;
 
           @include mobile {
             font-size: 35px;

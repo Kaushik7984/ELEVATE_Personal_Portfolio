@@ -17,7 +17,10 @@ const initialForm = {
   mode: "",
   technologies: "",
   description: "",
+  logo: null,
 };
+
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const ManageExperience = ({ onBack }) => {
   const { data: experiences = [], isLoading, isError, refetch } = useGetExperiencesQuery();
@@ -27,27 +30,42 @@ const ManageExperience = ({ onBack }) => {
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
+  const [logoPreview, setLogoPreview] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const { name, value, files } = e.target;
+    if (name === "logo" && files && files[0]) {
+      setForm({ ...form, logo: files[0] });
+      setLogoPreview(URL.createObjectURL(files[0]));
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const payload = {
-      ...form,
-      technologies: form.technologies.split(",").map((t) => t.trim()),
-    };
+    const formData = new FormData();
+    formData.append("role", form.role);
+    formData.append("company", form.company);
+    formData.append("type", form.type);
+    formData.append("duration", form.duration);
+    formData.append("location", form.location);
+    formData.append("mode", form.mode);
+    formData.append("technologies", form.technologies);
+    formData.append("description", form.description);
+    if (form.logo instanceof File) {
+      formData.append("logo", form.logo);
+    }
     try {
       if (editingId) {
-        await updateExperience({ id: editingId, ...payload }).unwrap();
+        await updateExperience({ id: editingId, body: formData }).unwrap();
         setEditingId(null);
       } else {
-        await createExperience(payload).unwrap();
+        await createExperience(formData).unwrap();
       }
       setForm(initialForm);
+      setLogoPreview("");
       refetch();
     } catch (err) {
       setError("Error saving experience.");
@@ -58,7 +76,9 @@ const ManageExperience = ({ onBack }) => {
     setForm({
       ...exp,
       technologies: exp.technologies.join(", "),
+      logo: null, // reset file input
     });
+    setLogoPreview(exp.logo ? `${BACKEND_URL}/uploads/${exp.logo}` : "");
     setEditingId(exp._id);
   };
 
@@ -75,7 +95,8 @@ const ManageExperience = ({ onBack }) => {
         <button onClick={onBack} style={{ marginBottom: 16 }}>
           ← Back to Dashboard
         </button>
-      )}      <h2 className={styles.heading}>Manage Experience</h2>
+      )}
+      <h2 className={styles.heading}>Manage Experience</h2>
       <form className={styles.form} onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
         <input className={styles.input} name="role" value={form.role} onChange={handleChange} placeholder="Role" required />
         <input className={styles.input} name="company" value={form.company} onChange={handleChange} placeholder="Company" required />
@@ -85,6 +106,10 @@ const ManageExperience = ({ onBack }) => {
         <input className={styles.input} name="mode" value={form.mode} onChange={handleChange} placeholder="Mode (e.g. Remote)" required />
         <input className={styles.input} name="technologies" value={form.technologies} onChange={handleChange} placeholder="Technologies (comma separated)" required />
         <textarea className={styles.textarea} name="description" value={form.description} onChange={handleChange} placeholder="Description" required />
+        <input className={styles.input} type="file" name="logo" accept="image/*" onChange={handleChange} />
+        {logoPreview && (
+          <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: 120, maxHeight: 80, margin: '10px 0', borderRadius: 8 }} />
+        )}
         <button className={styles.button} type="submit">{editingId ? "Update" : "Add"} Experience</button>
         {error && <div className={styles.error}>{error}</div>}
       </form>
@@ -96,6 +121,9 @@ const ManageExperience = ({ onBack }) => {
         <ul className={styles.experienceList}>
           {experiences.map((exp) => (
             <li className={styles.experienceCard} key={exp._id}>
+              {exp.logo && (
+                <img src={`${BACKEND_URL}/uploads/${exp.logo}`} alt="Logo" style={{ maxWidth: 80, maxHeight: 60, borderRadius: 6, marginBottom: 8 }} />
+              )}
               <span className={styles.experienceTitle}><strong>{exp.role}</strong> @ {exp.company} ({exp.type})</span>
               <span>{exp.duration} | {exp.location} | {exp.mode}</span>
               <span><strong>Technologies:</strong> {exp.technologies.join(", ")}</span>
