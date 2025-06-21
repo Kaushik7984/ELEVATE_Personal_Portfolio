@@ -22,6 +22,14 @@ export const experienceApi = createApi({
       query: ({ id, body }) => ({ url: `experience/${id}`, method: 'PUT', body }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Experience', id }],
     }),
+    reorderExperiences: builder.mutation({
+      query: (experiences) => ({
+        url: 'experience/reorder',
+        method: 'PUT',
+        body: { experiences },
+      }),
+      invalidatesTags: ['Experience'],
+    }),
     deleteExperience: builder.mutation({
       query: (id) => ({ url: `experience/${id}`, method: 'DELETE' }),
       invalidatesTags: (result, error, id) => [{ type: 'Experience', id }],
@@ -34,5 +42,6 @@ export const {
   useGetExperienceQuery,
   useCreateExperienceMutation,
   useUpdateExperienceMutation,
+  useReorderExperiencesMutation,
   useDeleteExperienceMutation,
 } = experienceApi; 

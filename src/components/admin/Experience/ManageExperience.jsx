@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useGetExperiencesQuery,
   useCreateExperienceMutation,
   useUpdateExperienceMutation,
   useDeleteExperienceMutation,
+  useReorderExperiencesMutation,
 } from "../../../redux/api/experienceApi";
 import PropTypes from "prop-types";
 import styles from "./ManageExperience.module.scss";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const initialForm = {
   role: "",
@@ -18,19 +27,66 @@ const initialForm = {
   technologies: "",
   description: "",
   logo: null,
+  order: 0,
 };
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+const SortableExperience = ({ experience, handleEdit, handleDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: experience._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={styles.experienceCard}
+    >
+      {experience.logo && (
+        <img src={`${BACKEND_URL}/uploads/${experience.logo}`} alt="Logo" style={{ maxWidth: 80, maxHeight: 60, borderRadius: 6, marginBottom: 8 }} />
+      )}
+      <span className={styles.experienceTitle}><strong>{experience.role}</strong> @ {experience.company} ({experience.type})</span>
+      <span>Order: {experience.order}</span>
+      <span>{experience.duration} | {experience.location} | {experience.mode}</span>
+      <span><strong>Technologies:</strong> {experience.technologies.join(", ")}</span>
+      <span className={styles.experienceDesc}>{experience.description}</span>
+      <div className={styles.cardActions}>
+        <button className={styles.editButton} onClick={() => handleEdit(experience)}>Edit</button>
+        <button className={styles.deleteButton} onClick={() => handleDelete(experience._id)} style={{ marginLeft: 8 }}>Delete</button>
+      </div>
+    </div>
+  );
+};
+
 const ManageExperience = ({ onBack }) => {
-  const { data: experiences = [], isLoading, isError, refetch } = useGetExperiencesQuery();
+  const { data: experiencesData, isLoading, isError, refetch } = useGetExperiencesQuery();
   const [createExperience] = useCreateExperienceMutation();
   const [updateExperience] = useUpdateExperienceMutation();
   const [deleteExperience] = useDeleteExperienceMutation();
+  const [reorderExperiences] = useReorderExperiencesMutation();
+  const [experiences, setExperiences] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [logoPreview, setLogoPreview] = useState("");
+
+  useEffect(() => {
+    if (experiencesData) {
+      setExperiences(experiencesData);
+    }
+  }, [experiencesData]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -54,6 +110,7 @@ const ManageExperience = ({ onBack }) => {
     formData.append("mode", form.mode);
     formData.append("technologies", form.technologies);
     formData.append("description", form.description);
+    formData.append("order", form.order);
     if (form.logo instanceof File) {
       formData.append("logo", form.logo);
     }
@@ -89,6 +146,17 @@ const ManageExperience = ({ onBack }) => {
     }
   };
 
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = experiences.findIndex((p) => p._id === active.id);
+      const newIndex = experiences.findIndex((p) => p._id === over.id);
+      const newOrder = arrayMove(experiences, oldIndex, newIndex);
+      setExperiences(newOrder);
+      await reorderExperiences(newOrder);
+    }
+  };
+
   return (
     <div className={styles.manageExperience}>
       {onBack && (
@@ -105,6 +173,7 @@ const ManageExperience = ({ onBack }) => {
         <input className={styles.input} name="location" value={form.location} onChange={handleChange} placeholder="Location" required />
         <input className={styles.input} name="mode" value={form.mode} onChange={handleChange} placeholder="Mode (e.g. Remote)" required />
         <input className={styles.input} name="technologies" value={form.technologies} onChange={handleChange} placeholder="Technologies (comma separated)" required />
+        <input type="number" name="order" value={form.order} onChange={handleChange} placeholder="Display Order" required className={styles.input} />
         <textarea className={styles.textarea} name="description" value={form.description} onChange={handleChange} placeholder="Description" required />
         <input className={styles.input} type="file" name="logo" accept="image/*" onChange={handleChange} />
         {logoPreview && (
@@ -113,35 +182,41 @@ const ManageExperience = ({ onBack }) => {
         <button className={styles.button} type="submit">{editingId ? "Update" : "Add"} Experience</button>
         {error && <div className={styles.error}>{error}</div>}
       </form>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : isError ? (
-        <div>Error loading experiences.</div>
-      ) : (
-        <ul className={styles.experienceList}>
-          {experiences.map((exp) => (
-            <li className={styles.experienceCard} key={exp._id}>
-              {exp.logo && (
-                <img src={`${BACKEND_URL}/uploads/${exp.logo}`} alt="Logo" style={{ maxWidth: 80, maxHeight: 60, borderRadius: 6, marginBottom: 8 }} />
-              )}
-              <span className={styles.experienceTitle}><strong>{exp.role}</strong> @ {exp.company} ({exp.type})</span>
-              <span>{exp.duration} | {exp.location} | {exp.mode}</span>
-              <span><strong>Technologies:</strong> {exp.technologies.join(", ")}</span>
-              <span className={styles.experienceDesc}>{exp.description}</span>
-              <div className={styles.cardActions}>
-                <button className={styles.editButton} onClick={() => handleEdit(exp)}>Edit</button>
-                <button className={styles.deleteButton} onClick={() => handleDelete(exp._id)} style={{ marginLeft: 8 }}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={experiences.map((p) => p._id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <ul className={styles.experienceList}>
+            {isLoading && <p>Loading...</p>}
+            {isError && <p>Error loading experiences.</p>}
+            {experiences &&
+              experiences.map((exp) => (
+                <SortableExperience
+                  key={exp._id}
+                  experience={exp}
+                  handleEdit={handleEdit}
+                  handleDelete={handleDelete}
+                />
+              ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
 
 ManageExperience.propTypes = {
   onBack: PropTypes.func,
+};
+
+SortableExperience.propTypes = {
+    experience: PropTypes.object.isRequired,
+    handleEdit: PropTypes.func.isRequired,
+    handleDelete: PropTypes.func.isRequired,
 };
 
 export default ManageExperience; 

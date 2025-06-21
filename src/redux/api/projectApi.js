@@ -20,7 +20,15 @@ export const projectApi = createApi({
     }),
     updateProject: builder.mutation({
       query: ({ id, body }) => ({ url: `projects/${id}`, method: 'PUT', body }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Project', id }],
+      invalidatesTags: (result, error, { id }) => [{ type: 'Project', id }, 'Project'],
+    }),
+    reorderProjects: builder.mutation({
+      query: (projects) => ({
+        url: 'projects/reorder',
+        method: 'PUT',
+        body: { projects },
+      }),
+      invalidatesTags: ['Project'],
     }),
     deleteProject: builder.mutation({
       query: (id) => ({ url: `projects/${id}`, method: 'DELETE' }),
@@ -35,4 +43,5 @@ export const {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useReorderProjectsMutation,
 } = projectApi; 

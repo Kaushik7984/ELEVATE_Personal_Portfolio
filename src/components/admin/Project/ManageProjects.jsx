@@ -1,28 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useGetProjectsQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useReorderProjectsMutation,
 } from "../../../redux/api/projectApi";
 import styles from "./ManageProjects.module.scss";
 import PropTypes from "prop-types";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-const initialForm = { title: "", img: "", desc: "", link: "" };
+const initialForm = { title: "", img: "", desc: "", link: "", order: 0 };
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
+const SortableProject = ({ project, handleEdit, handleDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: project._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={styles.projectCard}
+    >
+      <span className={styles.projectTitle}>{project.title}</span>
+      <span className={styles.projectOrder}>Order: {project.order}</span>
+      <img
+        src={`${BACKEND_URL}${project.img}`}
+        alt={project.title}
+        className={styles.projectImg}
+      />
+      <span className={styles.projectDesc}>{project.desc}</span>
+      <a
+        href={project.link}
+        target='_blank'
+        rel='noopener noreferrer'
+        className={styles.projectLink}
+      >
+        Demo
+      </a>
+      <div className={styles.cardActions}>
+        <button
+          onClick={() => handleEdit(project)}
+          className={styles.editButton}
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => handleDelete(project._id)}
+          className={styles.deleteButton}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const ManageProjects = ({ onBack }) => {
-  const { data: projects, isLoading, isError, refetch } = useGetProjectsQuery();
+  const { data: projectsData, isLoading, isError, refetch } = useGetProjectsQuery();
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
+  const [reorderProjects] = useReorderProjectsMutation();
+  const [projects, setProjects] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState("");
 
+  useEffect(() => {
+    if (projectsData) {
+      setProjects(projectsData);
+    }
+  }, [projectsData]);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: name === 'order' ? parseInt(value, 10) : value });
   };
 
   const handleFileChange = (e) => {
@@ -41,6 +115,7 @@ const ManageProjects = ({ onBack }) => {
     formData.append("title", form.title);
     formData.append("desc", form.desc);
     formData.append("link", form.link);
+    formData.append("order", String(form.order));
     if (form.img instanceof File) {
       formData.append("img", form.img);
     }
@@ -54,7 +129,6 @@ const ManageProjects = ({ onBack }) => {
       }
       setForm(initialForm);
       setImagePreview("");
-      // Reset file input if possible (by resetting the form)
       e.target.reset();
       refetch();
     } catch (err) {
@@ -68,6 +142,7 @@ const ManageProjects = ({ onBack }) => {
       img: project.img,
       desc: project.desc,
       link: project.link,
+      order: project.order,
     });
     setEditingId(project._id);
     setImagePreview(project.img ? `${BACKEND_URL}${project.img}` : "");
@@ -81,6 +156,17 @@ const ManageProjects = ({ onBack }) => {
       } catch {
         setError("Error deleting project.");
       }
+    }
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = projects.findIndex((p) => p._id === active.id);
+      const newIndex = projects.findIndex((p) => p._id === over.id);
+      const newOrder = arrayMove(projects, oldIndex, newIndex);
+      setProjects(newOrder);
+      await reorderProjects(newOrder);
     }
   };
 
@@ -123,6 +209,15 @@ const ManageProjects = ({ onBack }) => {
           required
           className={styles.input}
         />
+        <input
+          name='order'
+          type='number'
+          value={form.order}
+          onChange={handleChange}
+          placeholder='Display Order'
+          required
+          className={styles.input}
+        />
         <textarea
           name='desc'
           placeholder='Description'
@@ -150,50 +245,41 @@ const ManageProjects = ({ onBack }) => {
         )}
         {error && <span className={styles.error}>{error}</span>}
       </form>
-      <div className={styles.projectList}>
-        {isLoading && <p>Loading...</p>}
-        {isError && <p className={styles.error}>Error loading projects.</p>}
-        {projects && projects.length === 0 && <p>No projects found.</p>}
-        {projects &&
-          projects.map((project) => (
-            <div key={project._id} className={styles.projectCard}>
-              <span className={styles.projectTitle}>{project.title}</span>
-              <img
-                src={`${BACKEND_URL}${project.img}`}
-                alt={project.title}
-                className={styles.projectImg}
-              />
-              <span className={styles.projectDesc}>{project.desc}</span>
-              <a
-                href={project.link}
-                target='_blank'
-                rel='noopener noreferrer'
-                className={styles.projectLink}
-              >
-                Demo
-              </a>
-              <div className={styles.cardActions}>
-                <button
-                  onClick={() => handleEdit(project)}
-                  className={styles.editButton}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(project._id)}
-                  className={styles.deleteButton}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-      </div>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={projects.map((p) => p._id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className={styles.projectList}>
+            {isLoading && <p>Loading...</p>}
+            {isError && <p className={styles.error}>Error loading projects.</p>}
+            {projects && projects.length === 0 && <p>No projects found.</p>}
+            {projects &&
+              projects.map((project) => (
+                <SortableProject
+                  key={project._id}
+                  project={project}
+                  handleEdit={handleEdit}
+                  handleDelete={handleDelete}
+                />
+              ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
 ManageProjects.propTypes = {
   onBack: PropTypes.func,
+};
+
+SortableProject.propTypes = {
+    project: PropTypes.object.isRequired,
+    handleEdit: PropTypes.func.isRequired,
+    handleDelete: PropTypes.func.isRequired,
 };
 
 export default ManageProjects;
