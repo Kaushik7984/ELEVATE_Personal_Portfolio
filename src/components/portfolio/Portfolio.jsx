@@ -4,41 +4,44 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useGetProjectsQuery } from "../../redux/api/projectApi";
 import PropTypes from "prop-types";
 
-const BACKEND_URL = "http://localhost:5000";
+// const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const Single = ({ item }) => {
-    const ref = useRef();
+  const ref = useRef();
 
-    const { scrollYProgress } = useScroll({ 
-        target: ref, 
-        // offset: ["start start", "end start"] 
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    // offset: ["start start", "end start"]
   });
 
   const y = useTransform(scrollYProgress, [0, 1], [-300, 300]);
 
-    return (
+  return (
     <section>
       <div className='container'>
         <div className='wrapper'>
           <div className='imageContainer' ref={ref}>
             <img src={`${BACKEND_URL}${item.img}`} alt='' />
-                    </div>
-                    
+          </div>
+
           <motion.div className='textContainer' style={{ y }}>
             <h2>{item.title}</h2>
-                        <p>{item.desc}</p>
+            <p>{item.desc}</p>
             <div className='techStack'>
               {item.techStack?.map((tech, index) => (
-                <span key={index} className='techPill'>{tech}</span>
+                <span key={index} className='techPill'>
+                  {tech}
+                </span>
               ))}
             </div>
             <a href={item.link} target='_blank' rel='noopener noreferrer'>
               <button>See Demo</button>
             </a>
-                    </motion.div>
-                </div>
-            </div>
-        </section>
+          </motion.div>
+        </div>
+      </div>
+    </section>
   );
 };
 
@@ -55,18 +58,18 @@ Single.propTypes = {
 };
 
 const Portfolio = () => {
-    const ref = useRef();
-    const { data: items, isLoading, isError } = useGetProjectsQuery();
-  
-    const { scrollYProgress } = useScroll({
-      target: ref,
-      offset: ["end end", "start start"],
-    });
-  
-    const scaleX = useSpring(scrollYProgress, {
-      stiffness: 100,
-      damping: 30,
-    });
+  const ref = useRef();
+  const { data: items, isLoading, isError } = useGetProjectsQuery();
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["end end", "start start"],
+  });
+
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+  });
 
   if (isLoading)
     return (
@@ -84,13 +87,13 @@ const Portfolio = () => {
   return (
     <div className='portfolio' ref={ref}>
       <div className='progress'>
-            <h1>Featured Works</h1>
+        <h1>Featured Works</h1>
         <motion.div style={{ scaleX }} className='progressBar'></motion.div>
-          </div>
+      </div>
       {items &&
         items.map((item) => <Single item={item} key={item._id || item.id} />)}
-        </div>
-      );
-    };
+    </div>
+  );
+};
 
 export default Portfolio;

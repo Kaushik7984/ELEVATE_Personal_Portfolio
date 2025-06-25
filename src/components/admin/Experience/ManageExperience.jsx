@@ -30,16 +30,11 @@ const initialForm = {
   order: 0,
 };
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const SortableExperience = ({ experience, handleEdit, handleDelete }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: experience._id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: experience._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -55,23 +50,57 @@ const SortableExperience = ({ experience, handleEdit, handleDelete }) => {
       className={styles.experienceCard}
     >
       {experience.logo && (
-        <img src={`${BACKEND_URL}/uploads/${experience.logo}`} alt="Logo" style={{ maxWidth: 80, maxHeight: 60, borderRadius: 6, marginBottom: 8 }} />
+        <img
+          src={`${BACKEND_URL}/uploads/${experience.logo}`}
+          alt='Logo'
+          style={{
+            maxWidth: 80,
+            maxHeight: 60,
+            borderRadius: 6,
+            marginBottom: 8,
+          }}
+        />
       )}
-      <span className={styles.experienceTitle}><strong>{experience.role}</strong> @ {experience.company} ({experience.type})</span>
+      <span className={styles.experienceTitle}>
+        <strong>{experience.role}</strong> @ {experience.company} (
+        {experience.type})
+      </span>
       <span>Order: {experience.order}</span>
-      <span>{experience.duration} | {experience.location} | {experience.mode}</span>
-      <span><strong>Technologies:</strong> {experience.technologies.join(", ")}</span>
+      <span>
+        {experience.duration} | {experience.location} | {experience.mode}
+      </span>
+      <span>
+        <strong>Technologies:</strong> {experience.technologies.join(", ")}
+      </span>
       <span className={styles.experienceDesc}>{experience.description}</span>
       <div className={styles.cardActions}>
-        <button onPointerDown={(e) => e.stopPropagation()} className={styles.editButton} onClick={() => handleEdit(experience)}>Edit</button>
-        <button onPointerDown={(e) => e.stopPropagation()} className={styles.deleteButton} onClick={() => handleDelete(experience._id)} style={{ marginLeft: 8 }}>Delete</button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          className={styles.editButton}
+          onClick={() => handleEdit(experience)}
+        >
+          Edit
+        </button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          className={styles.deleteButton}
+          onClick={() => handleDelete(experience._id)}
+          style={{ marginLeft: 8 }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
 };
 
 const ManageExperience = ({ onBack }) => {
-  const { data: experiencesData, isLoading, isError, refetch } = useGetExperiencesQuery();
+  const {
+    data: experiencesData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetExperiencesQuery();
   const [createExperience] = useCreateExperienceMutation();
   const [updateExperience] = useUpdateExperienceMutation();
   const [deleteExperience] = useDeleteExperienceMutation();
@@ -169,27 +198,109 @@ const ManageExperience = ({ onBack }) => {
         </button>
       )}
       <h2 className={styles.heading}>Manage Experience</h2>
-      <form className={styles.form} onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
-        <input className={styles.input} name="role" value={form.role} onChange={handleChange} placeholder="Role" required />
-        <input className={styles.input} name="company" value={form.company} onChange={handleChange} placeholder="Company" required />
-        <input className={styles.input} name="type" value={form.type} onChange={handleChange} placeholder="Type (e.g. Full-time)" required />
-        <input className={styles.input} name="duration" value={form.duration} onChange={handleChange} placeholder="Duration" required />
-        <input className={styles.input} name="location" value={form.location} onChange={handleChange} placeholder="Location" required />
-        <input className={styles.input} name="mode" value={form.mode} onChange={handleChange} placeholder="Mode (e.g. Remote)" required />
-        <input className={styles.input} name="technologies" value={form.technologies} onChange={handleChange} placeholder="Technologies (comma separated)" required />
-        <input type="number" name="order" value={form.order} onChange={handleChange} placeholder="Display Order" required className={styles.input} />
-        <textarea className={styles.textarea} name="description" value={form.description} onChange={handleChange} placeholder="Description" required />
-        <input className={styles.input} type="file" name="logo" accept="image/*" onChange={handleChange} />
+      <form
+        className={styles.form}
+        onSubmit={handleSubmit}
+        style={{ marginBottom: 24 }}
+      >
+        <input
+          className={styles.input}
+          name='role'
+          value={form.role}
+          onChange={handleChange}
+          placeholder='Role'
+          required
+        />
+        <input
+          className={styles.input}
+          name='company'
+          value={form.company}
+          onChange={handleChange}
+          placeholder='Company'
+          required
+        />
+        <input
+          className={styles.input}
+          name='type'
+          value={form.type}
+          onChange={handleChange}
+          placeholder='Type (e.g. Full-time)'
+          required
+        />
+        <input
+          className={styles.input}
+          name='duration'
+          value={form.duration}
+          onChange={handleChange}
+          placeholder='Duration'
+          required
+        />
+        <input
+          className={styles.input}
+          name='location'
+          value={form.location}
+          onChange={handleChange}
+          placeholder='Location'
+          required
+        />
+        <input
+          className={styles.input}
+          name='mode'
+          value={form.mode}
+          onChange={handleChange}
+          placeholder='Mode (e.g. Remote)'
+          required
+        />
+        <input
+          className={styles.input}
+          name='technologies'
+          value={form.technologies}
+          onChange={handleChange}
+          placeholder='Technologies (comma separated)'
+          required
+        />
+        <input
+          type='number'
+          name='order'
+          value={form.order}
+          onChange={handleChange}
+          placeholder='Display Order'
+          required
+          className={styles.input}
+        />
+        <textarea
+          className={styles.textarea}
+          name='description'
+          value={form.description}
+          onChange={handleChange}
+          placeholder='Description'
+          required
+        />
+        <input
+          className={styles.input}
+          type='file'
+          name='logo'
+          accept='image/*'
+          onChange={handleChange}
+        />
         {logoPreview && (
-          <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: 120, maxHeight: 80, margin: '10px 0', borderRadius: 8 }} />
+          <img
+            src={logoPreview}
+            alt='Logo Preview'
+            style={{
+              maxWidth: 120,
+              maxHeight: 80,
+              margin: "10px 0",
+              borderRadius: 8,
+            }}
+          />
         )}
-        <button className={styles.button} type="submit">{editingId ? "Update" : "Add"} Experience</button>
+        <button className={styles.button} type='submit'>
+          {editingId ? "Update" : "Add"} Experience
+        </button>
         {error && <div className={styles.error}>{error}</div>}
       </form>
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={experiences.map((p) => p._id)}
           strategy={verticalListSortingStrategy}
@@ -218,9 +329,9 @@ ManageExperience.propTypes = {
 };
 
 SortableExperience.propTypes = {
-    experience: PropTypes.object.isRequired,
-    handleEdit: PropTypes.func.isRequired,
-    handleDelete: PropTypes.func.isRequired,
+  experience: PropTypes.object.isRequired,
+  handleEdit: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
-export default ManageExperience; 
+export default ManageExperience;

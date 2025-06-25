@@ -4,7 +4,7 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useGetExperiencesQuery } from "../../redux/api/experienceApi";
 import PropTypes from "prop-types";
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const SingleExperience = ({ item }) => {
   const ref = useRef();

@@ -17,17 +17,19 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const initialForm = { title: "", img: "", desc: "", link: "", order: 0, techStack: "" };
+const initialForm = {
+  title: "",
+  img: "",
+  desc: "",
+  link: "",
+  order: 0,
+  techStack: "",
+};
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const SortableProject = ({ project, handleEdit, handleDelete }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: project._id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: project._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -52,7 +54,10 @@ const SortableProject = ({ project, handleEdit, handleDelete }) => {
       <span className={styles.projectDesc}>{project.desc}</span>
       <div className={styles.techStack}>
         {project.techStack?.map((tech, index) => (
-          <span key={index} className={styles.techPill}>{tech}</span>
+          <span key={index} className={styles.techPill}>
+            {tech}
+            {index < project.techStack.length - 1 && ", "}
+          </span>
         ))}
       </div>
       <a
@@ -84,7 +89,12 @@ const SortableProject = ({ project, handleEdit, handleDelete }) => {
 };
 
 const ManageProjects = ({ onBack }) => {
-  const { data: projectsData, isLoading, isError, refetch } = useGetProjectsQuery();
+  const {
+    data: projectsData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetProjectsQuery();
   const [createProject] = useCreateProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
@@ -103,7 +113,10 @@ const ManageProjects = ({ onBack }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: name === 'order' ? parseInt(value, 10) : value });
+    setForm({
+      ...form,
+      [name]: name === "order" ? parseInt(value, 10) : value,
+    });
   };
 
   const handleFileChange = (e) => {
@@ -230,7 +243,7 @@ const ManageProjects = ({ onBack }) => {
         <input
           name='techStack'
           placeholder='Tech Stack (comma-separated)'
-          value={form.techStack || ''}
+          value={form.techStack || ""}
           onChange={handleChange}
           className={styles.input}
         />
@@ -261,10 +274,7 @@ const ManageProjects = ({ onBack }) => {
         )}
         {error && <span className={styles.error}>{error}</span>}
       </form>
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={projects.map((p) => p._id)}
           strategy={verticalListSortingStrategy}
@@ -293,9 +303,9 @@ ManageProjects.propTypes = {
 };
 
 SortableProject.propTypes = {
-    project: PropTypes.object.isRequired,
-    handleEdit: PropTypes.func.isRequired,
-    handleDelete: PropTypes.func.isRequired,
+  project: PropTypes.object.isRequired,
+  handleEdit: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 export default ManageProjects;
